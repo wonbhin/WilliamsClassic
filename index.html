@@ -41,15 +41,46 @@
         .timer-val { font-weight: 700; font-size: 1.1rem; letter-spacing: 1px; }
 
         /* 2. 메인 대시보드 */
-        .card { background-color: var(--card); border-radius: 12px; padding: 25px; border: 1px solid #2b3139; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .card { background-color: var(--card); border-radius: 12px; padding: 25px; border: 1px solid #2b3139; box-shadow: 0 4px 20px rgba(0,0,0,0.3); position: relative; }
         .mono { font-family: 'Roboto Mono', monospace; }
 
-        .badge-container { text-align: center; margin-bottom: 20px; }
-        .badge { display: inline-block; padding: 8px 18px; border-radius: 6px; font-weight: 800; font-size: 1rem; letter-spacing: 1px; text-transform: uppercase; }
+        /* 코인 선택 헤더 */
+        .coin-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #333;
+        }
+        .coin-symbol { font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: 1px; line-height: 1; }
+        .coin-sub { font-size: 0.9rem; color: var(--gray); font-weight: normal; margin-left: 5px; }
+        
+        .coin-select {
+            background: var(--input-bg); color: #fff; border: 1px solid #444;
+            padding: 8px 12px; border-radius: 6px; font-weight: bold; 
+            font-size: 0.9rem; cursor: pointer; outline: none;
+            transition: 0.2s;
+        }
+        .coin-select:hover { border-color: var(--gray); }
+
+        /* 추세 뱃지 (툴팁 제거로 더욱 깔끔하게) */
+        .badge-container { 
+            display: flex; 
+            justify-content: center; 
+            margin-bottom: 20px; 
+        }
+        .badge { 
+            display: block; 
+            padding: 8px 20px; /* 좌우 패딩 살짝 증가 */
+            border-radius: 6px; 
+            font-weight: 800; 
+            font-size: 1rem; 
+            letter-spacing: 1px; 
+            text-transform: uppercase; 
+        }
+
         .trend-up { background: rgba(14, 203, 129, 0.15); color: var(--green); border: 1px solid var(--green); box-shadow: 0 0 15px rgba(14, 203, 129, 0.2); }
         .trend-down { background: rgba(246, 70, 93, 0.15); color: var(--red); border: 1px solid var(--red); box-shadow: 0 0 15px rgba(246, 70, 93, 0.2); }
         .trend-wait { background: #2b3139; color: var(--gray); border: 1px solid #444; }
 
+        /* 가격 정보 */
         .price-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #333; }
         .price-item { display: flex; flex-direction: column; }
         .price-label { font-size: 0.8rem; color: var(--gray); margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
@@ -64,10 +95,9 @@
         /* 3. 자금 관리 & 설정 */
         .settings-card { background: #161a1e; border: 1px solid #333; border-radius: 10px; padding: 15px; font-size: 0.9rem; }
         .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .input-label { display: flex; align-items: center; gap: 5px; } /* 아이콘 정렬용 */
+        .input-label { display: flex; align-items: center; gap: 5px; } 
         
-        .basic-input, select { background: var(--input-bg); color: #fff; border: 1px solid #444; padding: 6px; border-radius: 4px; font-weight: bold; text-align: center; font-family: 'Roboto Mono'; width: 70px; }
-        select { width: 120px; text-align: left; }
+        .basic-input { background: var(--input-bg); color: #fff; border: 1px solid #444; padding: 6px; border-radius: 4px; font-weight: bold; text-align: center; font-family: 'Roboto Mono'; width: 70px; }
         
         .risk-result { background: #000; padding: 12px; border-radius: 6px; text-align: center; margin-top: 10px; border: 1px solid #444; }
         .risk-val { font-size: 1.3rem; font-weight: bold; color: var(--gold); display: block; margin-top: 5px; }
@@ -93,64 +123,26 @@
         .toggle-label { font-size: 0.9rem; color: #fff; margin-right: 10px; font-weight: 500; vertical-align: middle; display: flex; align-items: center; gap: 5px; }
         .sub-text { font-size: 0.75rem; color: var(--gray); margin-left: 5px; }
 
-        /* 🔥 [New] 물음표 아이콘 & 툴팁 스타일 🔥 */
+        /* 툴팁 아이콘 & 스타일 */
         .help-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            background-color: #333;
-            color: #888;
-            font-size: 10px;
-            font-weight: bold;
-            cursor: help;
-            border: 1px solid #444;
-            position: relative;
-            transition: 0.2s;
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 15px; height: 15px; border-radius: 50%;
+            background-color: #333; color: #888; font-size: 10px; font-weight: bold;
+            cursor: help; border: 1px solid #444; position: relative; transition: 0.2s;
         }
+        .help-icon:hover { background-color: var(--blue); color: #fff; border-color: var(--blue); }
 
-        .help-icon:hover {
-            background-color: var(--blue);
-            color: #fff;
-            border-color: var(--blue);
-        }
-
-        /* 툴팁 본문 */
         .help-icon:hover::after {
             content: attr(data-tooltip);
-            position: absolute;
-            bottom: 120%; /* 아이콘 위쪽 */
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.95);
-            color: #fff;
-            padding: 10px 12px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            white-space: pre-wrap;
-            width: max-content;
-            max-width: 220px;
-            z-index: 999;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            border: 1px solid #444;
-            line-height: 1.4;
-            font-weight: normal;
-            pointer-events: none;
-            text-align: left;
+            position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.95); color: #fff; padding: 10px 12px; border-radius: 6px;
+            font-size: 0.8rem; white-space: pre-wrap; width: max-content; max-width: 220px;
+            z-index: 999; box-shadow: 0 5px 15px rgba(0,0,0,0.5); border: 1px solid #444;
+            line-height: 1.4; font-weight: normal; pointer-events: none; text-align: left;
         }
-
-        /* 툴팁 화살표 */
         .help-icon:hover::before {
-            content: "";
-            position: absolute;
-            bottom: 80%; /* 위치 미세 조정 */
-            left: 50%;
-            transform: translateX(-50%);
-            border: 5px solid transparent;
-            border-top-color: #444; /* 테두리색 */
-            z-index: 999;
+            content: ""; position: absolute; bottom: 80%; left: 50%; transform: translateX(-50%);
+            border: 5px solid transparent; border-top-color: #444; z-index: 999;
         }
 
         .blink { animation: blinker 1.5s linear infinite; }
@@ -163,7 +155,7 @@
 <div class="container">
     <div style="display:flex; justify-content:space-between; align-items:center;">
         <h2 style="margin:0;">🏛️ Williams Master</h2>
-        <div class="mono" style="font-size:0.75rem; color:var(--gray);">v9.0 Final Design</div>
+        <div class="mono" style="font-size:0.75rem; color:var(--gray);">v10.1 Minimal</div>
     </div>
 
     <div class="timer-bar">
@@ -175,12 +167,23 @@
     </div>
 
     <div class="card">
+        <div class="coin-header">
+            <div>
+                <div id="coinSymbol" class="coin-symbol">BTC</div>
+                <div class="coin-sub mono">/ USDT</div>
+            </div>
+            <select id="coinSelect" class="coin-select" onchange="resetData()">
+                <option value="BTCUSDT">Bitcoin</option>
+                <option value="ETHUSDT">Ethereum</option>
+                <option value="SOLUSDT">Solana</option>
+                <option value="XRPUSDT">Ripple</option>
+            </select>
+        </div>
+
         <div class="badge-container">
             <div id="trendBadge" class="badge trend-wait blink">
                 ANALYZING...
             </div>
-            <span class="help-icon" style="margin-left:5px; vertical-align: middle;" 
-                  data-tooltip="20일 이동평균선 기준 추세입니다.&#10;LONG이면 매수만, SHORT면 매도만 진입합니다.">?</span>
         </div>
 
         <div class="price-row mono">
@@ -218,15 +221,6 @@
     <div class="settings-card">
         <div style="font-weight:bold; color:#fff; margin-bottom:10px;">⚙️ 설정 및 자금 관리</div>
         
-        <div class="input-row">
-            <span>대상 코인</span>
-            <select id="coinSelect" onchange="resetData()">
-                <option value="BTCUSDT">Bitcoin</option>
-                <option value="ETHUSDT">Ethereum</option>
-                <option value="SOLUSDT">Solana</option>
-                <option value="XRPUSDT">Ripple</option>
-            </select>
-        </div>
         <div class="input-row">
             <div class="input-label">
                 노이즈 비율 (K)
@@ -308,6 +302,10 @@
     updateTimer();
 
     function resetData() {
+        const select = document.getElementById('coinSelect');
+        const symbolCode = select.value.replace('USDT', '');
+        document.getElementById('coinSymbol').innerText = symbolCode;
+        
         document.getElementById('trendBadge').innerText = "ANALYZING...";
         document.getElementById('targetPrice').innerText = "---";
         fetchData();
