@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Williams Master V3.4</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WilliamsClassic</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -18,6 +18,8 @@
             --gray: #848e9c;
         }
         
+        * { box-sizing: border-box; }
+
         body { 
             background-color: var(--bg); color: var(--text); font-family: 'Noto Sans KR', sans-serif; 
             display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 15px; 
@@ -27,7 +29,7 @@
         .mono { font-family: 'Roboto Mono', monospace; }
 
         .card { 
-            background-color: var(--card); border-radius: 12px; padding: 25px; 
+            background-color: var(--card); border-radius: 12px; padding: 20px; 
             border: 1px solid #2b3139; box-shadow: 0 4px 20px rgba(0,0,0,0.3); position: relative; 
         }
         
@@ -38,19 +40,22 @@
         }
 
         .coin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #333; }
-        .coin-symbol { font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: 1px; line-height: 1; }
-        .coin-sub { font-size: 0.9rem; color: var(--gray); font-weight: normal; margin-left: 5px; }
-        .coin-select { background: var(--input-bg); color: #fff; border: 1px solid #444; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; cursor: pointer; }
+        .coin-symbol { font-size: 1.8rem; font-weight: 900; color: #fff; letter-spacing: 1px; line-height: 1; }
+        .coin-sub { font-size: 0.8rem; color: var(--gray); font-weight: normal; margin-left: 5px; }
+        .coin-select { background: var(--input-bg); color: #fff; border: 1px solid #444; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; cursor: pointer; outline: none; }
 
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .info-box { background: #13161a; border: 1px solid #333; border-radius: 8px; padding: 10px; }
+        .info-box { background: #13161a; border: 1px solid #333; border-radius: 8px; padding: 12px; }
         .info-label { font-size: 0.75rem; color: var(--gray); margin-bottom: 4px; }
-        .info-val { font-size: 0.95rem; font-weight: bold; color: #fff; white-space: nowrap; overflow: visible; } 
+        .info-val { font-size: 1rem; font-weight: bold; color: #fff; white-space: nowrap; } 
         .info-sub { font-size: 0.7rem; color: #666; margin-top: 2px; }
 
+        .price-row { display: flex; justify-content: space-between; align-items: end; margin-bottom: 15px; }
+
         .strategy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px; }
+        
         .action-box { 
-            text-align: center; padding: 15px 8px; border-radius: 8px; 
+            text-align: center; padding: 20px 10px; border-radius: 8px; 
             background: #13161a; border: 1px solid #333; transition: 0.3s; position: relative;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
@@ -60,51 +65,123 @@
         .action-box.long.active { background: rgba(14, 203, 129, 0.2); border-color: var(--green); color: var(--green); transform: scale(1.02); }
         .action-box.short.active { background: rgba(246, 70, 93, 0.2); border-color: var(--red); color: var(--red); transform: scale(1.02); }
         
-        .box-title { font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; }
-        .box-price { font-size: 1.3rem; font-weight: bold; margin-bottom: 5px; letter-spacing: 0.5px; }
+        .box-title { font-size: 0.8rem; font-weight: bold; margin-bottom: 8px; opacity: 0.8; letter-spacing: 0.5px; }
+        .box-price { font-size: 1.4rem; font-weight: bold; margin-bottom: 8px; letter-spacing: 0.5px; }
         
         .sl-label { 
             font-size: 0.85rem; color: var(--red); font-weight: bold; 
-            background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; display: inline-block; 
+            background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 4px; display: inline-block; 
         }
 
-        .badge-wrapper { margin-top: 8px; width: 100%; display: flex; justify-content: center; }
-        .trend-warning { display: none; background: var(--gold); color: #000; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 4px; }
-        .trend-safe { display: none; background: #333; color: #aaa; font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; }
+        .badge-wrapper { margin-top: 10px; width: 100%; display: flex; justify-content: center; flex-wrap: wrap; gap: 5px; }
+        
+        /* 뱃지 스타일 수정 (색상 대비 강화) */
+        .trend-warning { 
+            display: none; 
+            background: var(--gold); 
+            color: #111; /* 검은 글씨로 가독성 확보 */
+            font-size: 0.75rem; 
+            font-weight: bold; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+        }
+        .trend-safe { 
+            display: none; 
+            background: var(--green); /* 밝은 녹색 */
+            color: #111; /* 검은 글씨로 가독성 확보 */
+            font-size: 0.75rem; 
+            font-weight: bold; /* 굵게 */
+            padding: 4px 8px; 
+            border-radius: 4px; 
+        }
 
-        .wr-card { background: #161a1e; border: 1px solid #333; border-radius: 10px; padding: 15px; margin-top: 15px; }
-        .wr-track { height: 8px; background: #2b3139; border-radius: 4px; width: 100%; position: relative; margin: 10px 0; overflow: hidden; }
-        .wr-fill { height: 100%; width: 50%; border-radius: 4px; transition: width 0.5s ease; }
+        .wr-card { background: #161a1e; border: 1px solid #333; border-radius: 10px; padding: 20px; margin-top: 15px; }
+        .wr-track { height: 10px; background: #2b3139; border-radius: 5px; width: 100%; position: relative; margin: 15px 0; overflow: hidden; }
+        .wr-fill { height: 100%; width: 50%; border-radius: 5px; transition: width 0.5s ease; }
         .wr-line { position: absolute; top:0; bottom:0; width:1px; background: #555; z-index: 2; }
         
         .help-icon {
             display: inline-flex; align-items: center; justify-content: center;
-            width: 16px; height: 16px; border-radius: 50%;
-            background-color: #333; color: #888; font-size: 11px; font-weight: bold;
+            width: 18px; height: 18px; border-radius: 50%;
+            background-color: #333; color: #888; font-size: 12px; font-weight: bold;
             cursor: help; border: 1px solid #444; position: relative; margin-left: 4px;
         }
         .help-icon:hover::after {
             content: attr(data-tooltip);
             position: absolute; bottom: 140%; left: 50%; transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.95); color: #fff; padding: 10px 12px; border-radius: 6px;
-            font-size: 0.8rem; white-space: pre-wrap; width: max-content; max-width: 250px;
+            background: rgba(0, 0, 0, 0.95); color: #fff; padding: 12px; border-radius: 8px;
+            font-size: 0.8rem; white-space: pre-wrap; width: 220px;
             z-index: 9999; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 1px solid #555; pointer-events: none; text-align: left;
         }
 
-        .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.9rem; }
-        .basic-input { background: var(--input-bg); color: #fff; border: 1px solid #444; padding: 6px; border-radius: 4px; width: 70px; text-align: center; font-weight: bold; }
+        .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.95rem; }
+        .basic-input { background: var(--input-bg); color: #fff; border: 1px solid #444; padding: 8px; border-radius: 6px; width: 80px; text-align: center; font-weight: bold; font-size: 1rem; }
         
-        .risk-result { background: #000; padding: 12px; border-radius: 6px; text-align: center; margin-top: 10px; border: 1px solid #444; }
-        .risk-val { font-size: 1.2rem; font-weight: bold; color: var(--gold); display: block; margin-top: 5px; }
-        .qty-val { border-top: 1px dashed #333; margin-top: 8px; padding-top: 8px; font-size: 0.9rem; color: #ccc; }
+        .risk-result { background: #000; padding: 20px; border-radius: 8px; margin-top: 15px; border: 1px solid #444; }
+        .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; border-top: 1px dashed #333; padding-top: 15px; }
+        .res-box { text-align: center; }
+        .res-label { font-size: 0.8rem; color: var(--gray); margin-bottom: 4px; }
+        .res-val { font-size: 1rem; font-weight: bold; color: #fff; }
+        .qty-big { font-size: 1.5rem; font-weight: bold; color: var(--gold); display: block; text-align: center; margin-bottom: 5px; }
+
+        .footer-principles {
+            margin-top: 30px;
+            padding: 20px;
+            background: #101216;
+            border-top: 1px solid #333;
+            border-radius: 8px;
+            color: #888;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+        .footer-title {
+            color: var(--gold);
+            font-weight: bold;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+        .footer-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .footer-list li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 8px;
+            word-break: keep-all; 
+            line-height: 1.5;
+        }
+        .footer-list li::before {
+            content: "•";
+            color: var(--blue);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        @media (max-width: 480px) {
+            .container { width: 100%; padding: 5px; }
+            .card { padding: 15px; }
+            .coin-header { flex-direction: column; align-items: stretch; gap: 10px; }
+            .coin-header > div { display: flex; justify-content: space-between; align-items: baseline; }
+            .coin-select { width: 100%; text-align: center; padding: 12px; }
+            .strategy-grid { grid-template-columns: 1fr; gap: 15px; }
+            .action-box { padding: 25px 15px; }
+            .box-title { font-size: 0.9rem; }
+            .box-price { font-size: 1.6rem; }
+            .res-grid { grid-template-columns: 1fr; gap: 15px; }
+            .input-row { font-size: 0.9rem; }
+            .help-icon:hover::after { left: auto; right: -50px; transform: none; width: 200px; }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2 style="margin:0;">🏛️ Williams V3.4 <span style="font-size:0.8rem; color:var(--gold);">Final</span></h2>
-        <div class="mono" style="font-size:0.75rem; color:var(--gray);">Logic Corrected</div>
+    <div style="text-align:center; margin-bottom:5px;">
+        <h2 style="margin:0; font-family:'Roboto Mono'; letter-spacing: -1px;">🏛️ WilliamsClassic</h2>
     </div>
 
     <div class="timer-bar">
@@ -117,21 +194,21 @@
     <div class="card">
         <div class="coin-header">
             <div>
-                <div id="coinSymbol" class="coin-symbol">BTC</div>
-                <div class="coin-sub mono">/ USDT</div>
+                <span id="coinSymbol" class="coin-symbol">BTC</span>
+                <span class="coin-sub mono">/ USDT</span>
             </div>
             <select id="coinSelect" class="coin-select" onchange="resetData()">
-                <option value="BTCUSDT">Bitcoin</option>
-                <option value="ETHUSDT">Ethereum</option>
-                <option value="SOLUSDT">Solana</option>
-                <option value="XRPUSDT">Ripple</option>
+                <option value="BTCUSDT">Bitcoin (BTC)</option>
+                <option value="ETHUSDT">Ethereum (ETH)</option>
+                <option value="SOLUSDT">Solana (SOL)</option>
+                <option value="XRPUSDT">Ripple (XRP)</option>
             </select>
         </div>
 
         <div class="info-grid">
             <div class="info-box">
                 <div class="info-label">
-                    Dynamic K (20일 노이즈)
+                    Dynamic K (20일)
                 </div>
                 <div id="kVal" class="info-val mono">0.50</div>
                 <div id="kMsg" class="info-sub">데이터 계산 중...</div>
@@ -146,7 +223,7 @@
         </div>
 
         <div style="margin-bottom:20px;">
-            <div class="price-row" style="display:flex; justify-content:space-between; align-items:end;">
+            <div class="price-row">
                 <span style="font-size:0.85rem; color:var(--gray);">현재가 (Current)</span>
                 <span id="curPrice" class="mono" style="font-size:1.4rem; font-weight:bold;">---</span>
             </div>
@@ -154,20 +231,20 @@
 
         <div class="strategy-grid">
             <div id="boxLong" class="action-box long">
-                <div class="box-title">▲ LONG Breakout</div>
+                <div class="box-title">▲ LONG ENTRY PRICE</div>
                 <div id="longTarget" class="box-price mono">---</div>
                 <div class="sl-label">STOP: <span id="longSl" class="mono">---</span></div>
                 <div class="badge-wrapper">
-                    <div id="badgeLongSafe" class="trend-safe">순방향 (Safe)</div>
+                    <div id="badgeLongSafe" class="trend-safe">✅ 순방향 (Safe)</div>
                     <div id="badgeLongRisk" class="trend-warning">⚠️ 역추세 주의</div>
                 </div>
             </div>
             <div id="boxShort" class="action-box short">
-                <div class="box-title">▼ SHORT Breakout</div>
+                <div class="box-title">▼ SHORT ENTRY PRICE</div>
                 <div id="shortTarget" class="box-price mono">---</div>
                 <div class="sl-label">STOP: <span id="shortSl" class="mono">---</span></div>
                 <div class="badge-wrapper">
-                    <div id="badgeShortSafe" class="trend-safe">순방향 (Safe)</div>
+                    <div id="badgeShortSafe" class="trend-safe">✅ 순방향 (Safe)</div>
                     <div id="badgeShortRisk" class="trend-warning">⚠️ 역추세 주의</div>
                 </div>
             </div>
@@ -179,7 +256,7 @@
     </div>
 
     <div class="wr-card">
-        <div class="wr-header">
+        <div class="wr-header" style="display:flex; justify-content:space-between; align-items:center;">
             <span style="font-weight:bold; font-size:0.9rem;">📉 Williams %R (14)</span>
             <span id="wrVal" class="mono" style="font-weight:bold; font-size:1.1rem;">---</span>
         </div>
@@ -189,48 +266,66 @@
             <div id="wrFill" class="wr-fill" style="width: 0%; background: #555;"></div>
         </div>
         <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--gray); margin-top:5px;">
-            <span style="color:var(--green); font-weight:bold;">◀ 과매도 (-80이하) Buy</span>
-            <span style="color:var(--red); font-weight:bold;">과매수 (-20이상) Sell ▶</span>
+            <span style="color:var(--green); font-weight:bold;">◀ 과매도 (-80) Buy</span>
+            <span style="color:var(--red); font-weight:bold;">과매수 (-20) Sell ▶</span>
         </div>
-        <div id="wrDesc" style="text-align:center; font-size:0.8rem; margin-top:8px; color:#ccc;">분석 중...</div>
+        <div id="wrDesc" style="text-align:center; font-size:0.8rem; margin-top:10px; color:#ccc; line-height:1.4;">분석 중...</div>
     </div>
 
-    <div class="settings-card" style="margin-top:10px; background:#161a1e; border:1px solid #333; padding:15px; border-radius:10px;">
-        <div style="font-weight:bold; color:#fff; margin-bottom:10px;">💰 자금 관리 (Risk Management)</div>
+    <div class="settings-card" style="margin-top:10px; background:#161a1e; border:1px solid #333; padding:20px; border-radius:10px;">
+        <div style="font-weight:bold; color:#fff; margin-bottom:15px; font-size:1rem;">💰 자금 관리 (Risk Management)</div>
         <div class="input-row">
-            <span>내 증거금 (Total USDT)</span>
-            <input type="number" id="capital" placeholder="1000" class="basic-input" style="width:80px;" oninput="calcRisk()">
+            <span>내 증거금 (USDT)</span>
+            <input type="number" id="capital" placeholder="1000" class="basic-input" oninput="recalc()">
         </div>
         <div class="input-row">
             <span>허용 손실 (Risk %)</span>
-            <input type="number" id="riskPer" value="2" class="basic-input" oninput="calcRisk()">
+            <input type="number" id="riskPer" value="2" class="basic-input" oninput="recalc()">
         </div>
         <div class="input-row">
-            <span>레버리지 (Leverage)</span>
-            <input type="number" id="leverage" value="5" class="basic-input" oninput="calcRisk()">
+            <span>레버리지 (Lev)</span>
+            <input type="number" id="leverage" value="5" class="basic-input" oninput="recalc()">
         </div>
         
         <div class="risk-result">
-            <div style="display:flex; justify-content:center; gap:5px; align-items:center;">
-                <span style="font-size:0.8rem; color:var(--gray);">주문 가능 금액 (Cost)</span>
-                <span class="help-icon" data-tooltip="레버리지까지 반영된 실제 주문(Margin) 금액입니다.&#10;Total Position = Cost × Leverage">?</span>
+            <div style="font-size:0.8rem; color:var(--gray); margin-bottom:5px;">▼ 주문 수량 (Qty) : Long/Short 동일</div>
+            <div style="display:flex; justify-content:center; align-items:baseline; gap:5px;">
+                <span id="coinQty" class="qty-big mono">---</span>
+                <span id="qtyUnit" style="font-size:0.9rem; font-weight:bold; color:#ccc;">COIN</span>
             </div>
-            <span id="recMargin" class="risk-val mono">--- USDT</span>
-
-            <div class="qty-val">
-                <span style="font-size:0.8rem;">코인 수량 (Qty) = Cost × Lev / Price</span>
-                <div style="margin-top:5px;">
-                    ≈ <span id="coinQty" class="mono" style="color:#fff; font-weight:bold; font-size:1.1rem;">---</span>
-                    <span id="qtyUnit" style="font-size:0.8rem;">COIN</span>
+            
+            <div class="res-grid">
+                <div class="res-box">
+                    <div class="res-label">LONG 필요금액 (Cost)</div>
+                    <div id="longCost" class="res-val mono">---</div>
+                </div>
+                <div class="res-box">
+                    <div class="res-label">SHORT 필요금액 (Cost)</div>
+                    <div id="shortCost" class="res-val mono">---</div>
                 </div>
             </div>
+            <div style="font-size:0.7rem; color:#666; margin-top:10px; text-align:center; line-height:1.3;">
+                * 현재가가 아닌 <b>목표 진입가</b> 기준으로<br>계산된 정확한 값입니다.
+            </div>
         </div>
+    </div>
+
+    <div class="footer-principles">
+        <div class="footer-title">📜 래리 윌리엄스의 투자 원칙</div>
+        <ul class="footer-list">
+            <li><b>예측하지 마라:</b> 나는 시장이 어디로 갈지 모른다. 단지 현재 가격이 말해주는 대로 반응할 뿐이다.</li>
+            <li><b>자금 관리가 전부다:</b> 아무리 좋은 기법도 한 번의 파산을 막을 순 없다. 계좌의 2% 이상 잃지 마라.</li>
+            <li><b>손절은 생명이다:</b> 손실은 짧게, 수익은 길게 가져가라. 손절이 나가는 건 시스템이 나를 지켜준 것이다.</li>
+            <li><b>추세에 순응하라:</b> 떨어지는 칼날을 잡지 마라. 확실한 돌파가 나오면 그때 올라타도 늦지 않다.</li>
+        </ul>
     </div>
 </div>
 
 <script>
     let market = { current: 0, open: 0, range: 0, k: 0.5, ma20: 0 };
     let precision = 2;
+    let globalLongPrice = 0;
+    let globalShortPrice = 0;
 
     resetData();
     setInterval(fetchData, 2000);
@@ -324,6 +419,10 @@
 
         const longPrice = market.open + (market.range * market.k);
         const shortPrice = market.open - (market.range * market.k);
+        
+        globalLongPrice = longPrice;
+        globalShortPrice = shortPrice;
+
         const slDist = market.range * 0.5;
         const longSl = longPrice - slDist;
         const shortSl = shortPrice + slDist;
@@ -379,47 +478,40 @@
             wrDesc.innerText = "중립 구간";
         }
 
-        calcRisk();
+        recalc(); 
     }
 
-    // [수정됨] 자금 관리 로직 공식 수정
-    function calcRisk() {
+    function recalc() {
+        if(globalLongPrice === 0) return;
+        calcRisk(globalLongPrice, globalShortPrice);
+    }
+
+    function calcRisk(longPrice, shortPrice) {
         const capital = parseFloat(document.getElementById('capital').value) || 0;
         const riskPer = parseFloat(document.getElementById('riskPer').value) || 2;
         const leverage = parseFloat(document.getElementById('leverage').value) || 1;
         
-        if(market.current === 0) return;
-
-        // 1. 손절폭 계산 (윌리엄스: Range * 0.5)
         const slDist = market.range * 0.5;
-        const slPercent = slDist / market.current; // 예: 0.01 (1%)
+        if(slDist <= 0) return;
 
-        // 2. 리스크 금액 (내가 잃을 각오가 된 돈)
         const riskAmount = capital * (riskPer / 100);
+        const coinQty = riskAmount / slDist;
 
-        // 3. 총 포지션 규모 (Position Size) = 리스크 금액 / 손절%
-        // "이만큼 사야 손절났을 때 딱 2%만 잃는다"
-        const positionSizeUSDT = riskAmount / slPercent;
+        const costLong = (longPrice * coinQty) / leverage;
+        const costShort = (shortPrice * coinQty) / leverage;
 
-        // 4. 주문 가능 금액 (Cost) = 총 포지션 / 레버리지
-        // "레버리지를 쓰니까 내 지갑에서는 이만큼만 나간다"
-        const requiredMargin = positionSizeUSDT / leverage;
-
-        // 5. 코인 개수 (Qty) = (Cost * Leverage) / Price
-        // "결국 내가 주문창에 입력할 코인 개수는?"
-        // Cost * Leverage는 결국 Position Size와 같음
-        const coinQty = (requiredMargin * leverage) / market.current;
-
-        const marginEl = document.getElementById('recMargin');
-        marginEl.innerText = Math.floor(requiredMargin).toLocaleString() + " USDT";
-        
         document.getElementById('coinQty').innerText = coinQty.toFixed(4);
-
-        if(requiredMargin > capital) {
-            marginEl.style.color = "var(--red)";
-            marginEl.innerText += " (부족!)";
+        document.getElementById('longCost').innerText = Math.floor(costLong).toLocaleString() + " $";
+        document.getElementById('shortCost').innerText = Math.floor(costShort).toLocaleString() + " $";
+        
+        const maxCost = Math.max(costLong, costShort);
+        const qtyEl = document.getElementById('coinQty');
+        
+        if(maxCost > capital) {
+            qtyEl.style.color = "var(--red)";
+            qtyEl.innerText += " (부족!)";
         } else {
-            marginEl.style.color = "var(--gold)";
+            qtyEl.style.color = "var(--gold)";
         }
     }
 
