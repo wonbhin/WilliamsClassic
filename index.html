@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Williams Master Terminal</title>
+    <title>Williams Master V3.4</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { 
@@ -19,149 +19,97 @@
         }
         
         body { 
-            background-color: var(--bg); 
-            color: var(--text); 
-            font-family: 'Noto Sans KR', sans-serif; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
-            padding: 15px; 
+            background-color: var(--bg); color: var(--text); font-family: 'Noto Sans KR', sans-serif; 
+            display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 15px; 
         }
         
         .container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 15px; }
+        .mono { font-family: 'Roboto Mono', monospace; }
 
-        /* 1. 타이머 바 */
+        .card { 
+            background-color: var(--card); border-radius: 12px; padding: 25px; 
+            border: 1px solid #2b3139; box-shadow: 0 4px 20px rgba(0,0,0,0.3); position: relative; 
+        }
+        
         .timer-bar {
             background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.4);
             color: var(--blue); padding: 10px 15px; border-radius: 8px;
             display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem;
         }
-        .timer-val { font-weight: 700; font-size: 1.1rem; letter-spacing: 1px; }
 
-        /* 2. 메인 대시보드 */
-        .card { background-color: var(--card); border-radius: 12px; padding: 25px; border: 1px solid #2b3139; box-shadow: 0 4px 20px rgba(0,0,0,0.3); position: relative; }
-        .mono { font-family: 'Roboto Mono', monospace; }
-
-        /* 코인 선택 헤더 */
-        .coin-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #333;
-        }
+        .coin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #333; }
         .coin-symbol { font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: 1px; line-height: 1; }
         .coin-sub { font-size: 0.9rem; color: var(--gray); font-weight: normal; margin-left: 5px; }
-        
-        .coin-select {
-            background: var(--input-bg); color: #fff; border: 1px solid #444;
-            padding: 8px 12px; border-radius: 6px; font-weight: bold; 
-            font-size: 0.9rem; cursor: pointer; outline: none;
-            transition: 0.2s;
+        .coin-select { background: var(--input-bg); color: #fff; border: 1px solid #444; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; cursor: pointer; }
+
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .info-box { background: #13161a; border: 1px solid #333; border-radius: 8px; padding: 10px; }
+        .info-label { font-size: 0.75rem; color: var(--gray); margin-bottom: 4px; }
+        .info-val { font-size: 0.95rem; font-weight: bold; color: #fff; white-space: nowrap; overflow: visible; } 
+        .info-sub { font-size: 0.7rem; color: #666; margin-top: 2px; }
+
+        .strategy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px; }
+        .action-box { 
+            text-align: center; padding: 15px 8px; border-radius: 8px; 
+            background: #13161a; border: 1px solid #333; transition: 0.3s; position: relative;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .coin-select:hover { border-color: var(--gray); }
-
-        /* 추세 뱃지 (툴팁 제거로 더욱 깔끔하게) */
-        .badge-container { 
-            display: flex; 
-            justify-content: center; 
-            margin-bottom: 20px; 
-        }
-        .badge { 
-            display: block; 
-            padding: 8px 20px; /* 좌우 패딩 살짝 증가 */
-            border-radius: 6px; 
-            font-weight: 800; 
-            font-size: 1rem; 
-            letter-spacing: 1px; 
-            text-transform: uppercase; 
+        .action-box.long { border-color: #1e3a2f; color: #6db695; }
+        .action-box.short { border-color: #3a1e22; color: #b66d74; }
+        
+        .action-box.long.active { background: rgba(14, 203, 129, 0.2); border-color: var(--green); color: var(--green); transform: scale(1.02); }
+        .action-box.short.active { background: rgba(246, 70, 93, 0.2); border-color: var(--red); color: var(--red); transform: scale(1.02); }
+        
+        .box-title { font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; }
+        .box-price { font-size: 1.3rem; font-weight: bold; margin-bottom: 5px; letter-spacing: 0.5px; }
+        
+        .sl-label { 
+            font-size: 0.85rem; color: var(--red); font-weight: bold; 
+            background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; display: inline-block; 
         }
 
-        .trend-up { background: rgba(14, 203, 129, 0.15); color: var(--green); border: 1px solid var(--green); box-shadow: 0 0 15px rgba(14, 203, 129, 0.2); }
-        .trend-down { background: rgba(246, 70, 93, 0.15); color: var(--red); border: 1px solid var(--red); box-shadow: 0 0 15px rgba(246, 70, 93, 0.2); }
-        .trend-wait { background: #2b3139; color: var(--gray); border: 1px solid #444; }
+        .badge-wrapper { margin-top: 8px; width: 100%; display: flex; justify-content: center; }
+        .trend-warning { display: none; background: var(--gold); color: #000; font-size: 0.75rem; font-weight: bold; padding: 3px 8px; border-radius: 4px; }
+        .trend-safe { display: none; background: #333; color: #aaa; font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; }
 
-        /* 가격 정보 */
-        .price-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #333; }
-        .price-item { display: flex; flex-direction: column; }
-        .price-label { font-size: 0.8rem; color: var(--gray); margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
-        .price-val { font-size: 1.4rem; font-weight: 700; }
-        .ma-val { font-size: 1.1rem; color: var(--gold); }
-
-        .action-box { text-align: center; padding: 20px; border-radius: 8px; background: #13161a; border: 2px solid #333; transition: 0.3s; }
-        .action-label { color: var(--gray); font-size: 0.9rem; margin-bottom: 5px; display: flex; justify-content: center; align-items: center; gap: 5px; }
-        .target-price { font-size: 2.4rem; font-weight: 700; letter-spacing: 1px; margin: 5px 0; }
-        .sl-info { color: var(--red); font-weight: bold; font-size: 1rem; margin-top: 10px; }
+        .wr-card { background: #161a1e; border: 1px solid #333; border-radius: 10px; padding: 15px; margin-top: 15px; }
+        .wr-track { height: 8px; background: #2b3139; border-radius: 4px; width: 100%; position: relative; margin: 10px 0; overflow: hidden; }
+        .wr-fill { height: 100%; width: 50%; border-radius: 4px; transition: width 0.5s ease; }
+        .wr-line { position: absolute; top:0; bottom:0; width:1px; background: #555; z-index: 2; }
         
-        /* 3. 자금 관리 & 설정 */
-        .settings-card { background: #161a1e; border: 1px solid #333; border-radius: 10px; padding: 15px; font-size: 0.9rem; }
-        .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .input-label { display: flex; align-items: center; gap: 5px; } 
-        
-        .basic-input { background: var(--input-bg); color: #fff; border: 1px solid #444; padding: 6px; border-radius: 4px; font-weight: bold; text-align: center; font-family: 'Roboto Mono'; width: 70px; }
-        
-        .risk-result { background: #000; padding: 12px; border-radius: 6px; text-align: center; margin-top: 10px; border: 1px solid #444; }
-        .risk-val { font-size: 1.3rem; font-weight: bold; color: var(--gold); display: block; margin-top: 5px; }
-
-        /* 4. 멘탈 관리 */
-        .mind-card { 
-            margin-top: 10px; padding: 20px; border-radius: 10px; 
-            background: linear-gradient(145deg, #1a1d21, #131518);
-            border-left: 4px solid var(--gold);
-            color: #ccc; line-height: 1.6; font-size: 0.9rem;
-        }
-        .mind-title { font-weight: bold; color: #fff; margin-bottom: 10px; font-size: 1rem; display: block; }
-        .quote { font-style: italic; color: var(--gray); margin-top: 10px; display: block; font-size: 0.85rem; }
-
-        /* 토글 스위치 */
-        .time-setting-row { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px dashed #333; }
-        .toggle-switch { position: relative; display: inline-block; width: 46px; height: 24px; vertical-align: middle; }
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #363c45; transition: .4s; border-radius: 34px; border: 1px solid #444; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-        input:checked + .slider { background-color: var(--blue); border-color: var(--blue); }
-        input:checked + .slider:before { transform: translateX(22px); }
-        .toggle-label { font-size: 0.9rem; color: #fff; margin-right: 10px; font-weight: 500; vertical-align: middle; display: flex; align-items: center; gap: 5px; }
-        .sub-text { font-size: 0.75rem; color: var(--gray); margin-left: 5px; }
-
-        /* 툴팁 아이콘 & 스타일 */
         .help-icon {
             display: inline-flex; align-items: center; justify-content: center;
-            width: 15px; height: 15px; border-radius: 50%;
-            background-color: #333; color: #888; font-size: 10px; font-weight: bold;
-            cursor: help; border: 1px solid #444; position: relative; transition: 0.2s;
+            width: 16px; height: 16px; border-radius: 50%;
+            background-color: #333; color: #888; font-size: 11px; font-weight: bold;
+            cursor: help; border: 1px solid #444; position: relative; margin-left: 4px;
         }
-        .help-icon:hover { background-color: var(--blue); color: #fff; border-color: var(--blue); }
-
         .help-icon:hover::after {
             content: attr(data-tooltip);
-            position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%);
+            position: absolute; bottom: 140%; left: 50%; transform: translateX(-50%);
             background: rgba(0, 0, 0, 0.95); color: #fff; padding: 10px 12px; border-radius: 6px;
-            font-size: 0.8rem; white-space: pre-wrap; width: max-content; max-width: 220px;
-            z-index: 999; box-shadow: 0 5px 15px rgba(0,0,0,0.5); border: 1px solid #444;
-            line-height: 1.4; font-weight: normal; pointer-events: none; text-align: left;
-        }
-        .help-icon:hover::before {
-            content: ""; position: absolute; bottom: 80%; left: 50%; transform: translateX(-50%);
-            border: 5px solid transparent; border-top-color: #444; z-index: 999;
+            font-size: 0.8rem; white-space: pre-wrap; width: max-content; max-width: 250px;
+            z-index: 9999; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 1px solid #555; pointer-events: none; text-align: left;
         }
 
-        .blink { animation: blinker 1.5s linear infinite; }
-        @keyframes blinker { 50% { opacity: 0; } }
-
+        .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.9rem; }
+        .basic-input { background: var(--input-bg); color: #fff; border: 1px solid #444; padding: 6px; border-radius: 4px; width: 70px; text-align: center; font-weight: bold; }
+        
+        .risk-result { background: #000; padding: 12px; border-radius: 6px; text-align: center; margin-top: 10px; border: 1px solid #444; }
+        .risk-val { font-size: 1.2rem; font-weight: bold; color: var(--gold); display: block; margin-top: 5px; }
+        .qty-val { border-top: 1px dashed #333; margin-top: 8px; padding-top: 8px; font-size: 0.9rem; color: #ccc; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2 style="margin:0;">🏛️ Williams Master</h2>
-        <div class="mono" style="font-size:0.75rem; color:var(--gray);">v10.1 Minimal</div>
+        <h2 style="margin:0;">🏛️ Williams V3.4 <span style="font-size:0.8rem; color:var(--gold);">Final</span></h2>
+        <div class="mono" style="font-size:0.75rem; color:var(--gray);">Logic Corrected</div>
     </div>
 
     <div class="timer-bar">
-        <div style="display:flex; align-items:center; gap:5px;">
-            <span>⏳ 09:00 청산까지</span>
-            <span class="help-icon" data-tooltip="장 마감(리셋) 시간입니다.&#10;이때 보유 중인 포지션을 전량 매도하세요.">?</span>
+        <div style="display:flex; align-items:center;">
+            <span>⏳ 09:00 리셋</span>
         </div>
         <span id="countdown" class="timer-val mono">--:--:--</span>
     </div>
@@ -180,134 +128,121 @@
             </select>
         </div>
 
-        <div class="badge-container">
-            <div id="trendBadge" class="badge trend-wait blink">
-                ANALYZING...
+        <div class="info-grid">
+            <div class="info-box">
+                <div class="info-label">
+                    Dynamic K (20일 노이즈)
+                </div>
+                <div id="kVal" class="info-val mono">0.50</div>
+                <div id="kMsg" class="info-sub">데이터 계산 중...</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">
+                    Market Trend (20MA)
+                </div>
+                <div id="trendVal" class="info-val mono">---</div>
+                <div id="trendMsg" class="info-sub">추세 파악 중...</div>
             </div>
         </div>
 
-        <div class="price-row mono">
-            <div class="price-item">
-                <span class="price-label">Current Price</span>
-                <span id="curPrice" class="price-val">---</span>
-            </div>
-            <div class="price-item" style="text-align:right;">
-                <span class="price-label">
-                    20MA (Trend)
-                    <span class="help-icon" data-tooltip="지난 20일간의 평균 가격입니다.&#10;현재가가 이 위에 있으면 상승장(Bull)입니다.">?</span>
-                </span>
-                <span id="maPrice" class="ma-val">---</span>
+        <div style="margin-bottom:20px;">
+            <div class="price-row" style="display:flex; justify-content:space-between; align-items:end;">
+                <span style="font-size:0.85rem; color:var(--gray);">현재가 (Current)</span>
+                <span id="curPrice" class="mono" style="font-size:1.4rem; font-weight:bold;">---</span>
             </div>
         </div>
 
-        <div id="actionBox" class="action-box">
-            <div id="actionTitle" class="action-label">
-                오늘의 진입 목표가
-                <span class="help-icon" data-tooltip="오늘 이 가격에 도달하면 추세가 터진 것입니다.&#10;거래소 앱에서 '예약 매수(Stop Market)'를 걸어두세요.">?</span>
+        <div class="strategy-grid">
+            <div id="boxLong" class="action-box long">
+                <div class="box-title">▲ LONG Breakout</div>
+                <div id="longTarget" class="box-price mono">---</div>
+                <div class="sl-label">STOP: <span id="longSl" class="mono">---</span></div>
+                <div class="badge-wrapper">
+                    <div id="badgeLongSafe" class="trend-safe">순방향 (Safe)</div>
+                    <div id="badgeLongRisk" class="trend-warning">⚠️ 역추세 주의</div>
+                </div>
             </div>
-            <div id="targetPrice" class="target-price mono">---</div>
-            <div id="statusMsg" style="font-size:0.9rem; font-weight:bold; color:#666;">데이터 수신 중...</div>
+            <div id="boxShort" class="action-box short">
+                <div class="box-title">▼ SHORT Breakout</div>
+                <div id="shortTarget" class="box-price mono">---</div>
+                <div class="sl-label">STOP: <span id="shortSl" class="mono">---</span></div>
+                <div class="badge-wrapper">
+                    <div id="badgeShortSafe" class="trend-safe">순방향 (Safe)</div>
+                    <div id="badgeShortRisk" class="trend-warning">⚠️ 역추세 주의</div>
+                </div>
+            </div>
         </div>
-
-        <div style="text-align:center; margin-top:20px;">
-            <div style="font-size:0.8rem; color:var(--gray); display:flex; justify-content:center; align-items:center; gap:5px;">
-                <span>▼ STOP LOSS (자동 손절 예약 필수)</span>
-                <span class="help-icon" data-tooltip="진입과 동시에 세팅해야 하는 안전벨트입니다.&#10;이 가격이 오면 미련 없이 손절하세요.">?</span>
-            </div>
-            <div id="stopPrice" class="sl-info mono">---</div>
+        
+        <div style="text-align:center; font-size:0.8rem; color:#fff; margin-top:10px; height:20px;">
+            <span id="msg">데이터 수신 대기...</span>
         </div>
     </div>
 
-    <div class="settings-card">
-        <div style="font-weight:bold; color:#fff; margin-bottom:10px;">⚙️ 설정 및 자금 관리</div>
-        
-        <div class="input-row">
-            <div class="input-label">
-                노이즈 비율 (K)
-                <span class="help-icon" data-tooltip="돌파 기준을 정하는 민감도입니다.&#10;0.5: 표준 (추천)&#10;0.4: 공격적 (자주 진입)&#10;0.6: 보수적 (신중 진입)">?</span>
-            </div>
-            <input type="number" id="kInput" value="0.5" step="0.1" class="basic-input" onchange="updateUI()">
+    <div class="wr-card">
+        <div class="wr-header">
+            <span style="font-weight:bold; font-size:0.9rem;">📉 Williams %R (14)</span>
+            <span id="wrVal" class="mono" style="font-weight:bold; font-size:1.1rem;">---</span>
         </div>
-        
-        <hr style="border-color:#333; margin:10px 0;">
+        <div class="wr-track">
+            <div class="wr-line" style="left: 20%;"></div> 
+            <div class="wr-line" style="left: 80%;"></div>
+            <div id="wrFill" class="wr-fill" style="width: 0%; background: #555;"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--gray); margin-top:5px;">
+            <span style="color:var(--green); font-weight:bold;">◀ 과매도 (-80이하) Buy</span>
+            <span style="color:var(--red); font-weight:bold;">과매수 (-20이상) Sell ▶</span>
+        </div>
+        <div id="wrDesc" style="text-align:center; font-size:0.8rem; margin-top:8px; color:#ccc;">분석 중...</div>
+    </div>
 
+    <div class="settings-card" style="margin-top:10px; background:#161a1e; border:1px solid #333; padding:15px; border-radius:10px;">
+        <div style="font-weight:bold; color:#fff; margin-bottom:10px;">💰 자금 관리 (Risk Management)</div>
         <div class="input-row">
-            <div class="input-label">
-                내 증거금 (Total)
-                <span class="help-icon" data-tooltip="선물 지갑에 있는 총 자산(USDT)입니다.&#10;정확한 리스크 계산을 위해 입력하세요.">?</span>
-            </div>
-            <input type="number" id="capital" placeholder="$1000" class="basic-input" oninput="calcRisk()">
+            <span>내 증거금 (Total USDT)</span>
+            <input type="number" id="capital" placeholder="1000" class="basic-input" style="width:80px;" oninput="calcRisk()">
         </div>
         <div class="input-row">
-            <div class="input-label">
-                허용 손실 (Risk %)
-                <span class="help-icon" data-tooltip="한 번 손절할 때 내 전체 자산에서&#10;잃어도 되는 비율입니다. (2% 추천)">?</span>
-            </div>
-            <input type="number" id="riskPer" value="2" step="0.5" class="basic-input" oninput="calcRisk()">
+            <span>허용 손실 (Risk %)</span>
+            <input type="number" id="riskPer" value="2" class="basic-input" oninput="calcRisk()">
         </div>
         <div class="input-row">
-            <span>레버리지 (Lev)</span>
+            <span>레버리지 (Leverage)</span>
             <input type="number" id="leverage" value="5" class="basic-input" oninput="calcRisk()">
         </div>
-
+        
         <div class="risk-result">
-            <div style="display:flex; justify-content:center; align-items:center; gap:5px; font-size:0.8rem; color:var(--gray);">
-                1회 진입 시 투입 금액 (Cost)
-                <span class="help-icon" data-tooltip="여기 나온 금액만큼만 주문창의 [Cost]에 입력하세요.&#10;레버리지를 써도 안전하게 자산을 지킬 수 있습니다.">?</span>
+            <div style="display:flex; justify-content:center; gap:5px; align-items:center;">
+                <span style="font-size:0.8rem; color:var(--gray);">주문 가능 금액 (Cost)</span>
+                <span class="help-icon" data-tooltip="레버리지까지 반영된 실제 주문(Margin) 금액입니다.&#10;Total Position = Cost × Leverage">?</span>
             </div>
             <span id="recMargin" class="risk-val mono">--- USDT</span>
-        </div>
 
-        <div class="time-setting-row">
-            <div style="display:flex; align-items:center;">
-                <span class="toggle-label">
-                    서머타임 <span class="sub-text">(-1h)</span>
-                    <span class="help-icon" data-tooltip="미국 증시 서머타임 기간에는&#10;마감 시간이 1시간 당겨집니다.">?</span>
-                </span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="dstCheck" onchange="updateTimer()">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            
-            <div style="display:flex; align-items:center; gap:5px; font-size:0.9rem; color:#ccc;">
-                <span style="display:flex; align-items:center; gap:4px;">
-                    마감: <span class="help-icon" data-tooltip="본인의 생활 패턴에 맞춰&#10;하루 매매를 종료할 시간을 설정하세요. (기본 9시)">?</span>
-                </span>
-                <input type="number" id="resetHour" value="9" class="basic-input" style="width:35px; padding:4px;" onchange="updateTimer()">
-                <span>시</span>
+            <div class="qty-val">
+                <span style="font-size:0.8rem;">코인 수량 (Qty) = Cost × Lev / Price</span>
+                <div style="margin-top:5px;">
+                    ≈ <span id="coinQty" class="mono" style="color:#fff; font-weight:bold; font-size:1.1rem;">---</span>
+                    <span id="qtyUnit" style="font-size:0.8rem;">COIN</span>
+                </div>
             </div>
         </div>
-    </div>
-
-    <div class="mind-card">
-        <span class="mind-title">🧘 래리 윌리엄스의 투자 원칙</span>
-        <ul>
-            <li><b>익절은 없다:</b> "장중에 10% 올랐다고 팔지 마라. 오늘 터진 추세는 내일 아침 9시까지 끝까지 발라먹어라."</li>
-            <li><b>손절은 생명이다:</b> "손절가에 도달하면 기계처럼 잘라라. 기도 매매는 파산의 지름길이다."</li>
-            <li><b>자금 관리:</b> "한 번의 거래에 전 재산의 2% 이상을 걸지 마라. 그래야 10번 연속 져도 살아남아 복구할 수 있다."</li>
-        </ul>
-        <span class="quote">"투자는 IQ가 아니라, <b>원칙을 지키는 인내심</b>의 싸움이다."</span>
     </div>
 </div>
 
 <script>
-    let market = { current: 0, open: 0, range: 0, ma20: 0 };
-    let strategy = { entry: 0, stop: 0, direction: '' };
-    let precision = 1;
+    let market = { current: 0, open: 0, range: 0, k: 0.5, ma20: 0 };
+    let precision = 2;
 
     resetData();
-    setInterval(fetchData, 2000); 
-    setInterval(updateTimer, 1000); 
+    setInterval(fetchData, 2000);
+    setInterval(updateTimer, 1000);
     updateTimer();
 
     function resetData() {
         const select = document.getElementById('coinSelect');
         const symbolCode = select.value.replace('USDT', '');
         document.getElementById('coinSymbol').innerText = symbolCode;
-        
-        document.getElementById('trendBadge').innerText = "ANALYZING...";
-        document.getElementById('targetPrice').innerText = "---";
+        document.getElementById('qtyUnit').innerText = symbolCode;
+        document.getElementById('msg').innerText = "데이터 분석 중...";
         fetchData();
     }
 
@@ -318,10 +253,9 @@
             else if(symbol.startsWith('XRP')) precision = 4;
             else precision = 2;
 
-            const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1d&limit=25`);
+            const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1d&limit=50`);
             const data = await res.json();
-            
-            if(!data || data.length < 25) throw new Error("Data Error");
+            if(!data || data.length < 50) throw new Error("API Error");
 
             const today = data[data.length - 1]; 
             const prev = data[data.length - 2]; 
@@ -330,121 +264,175 @@
             market.open = parseFloat(today[1]);    
             market.range = parseFloat(prev[2]) - parseFloat(prev[3]); 
 
-            let sum = 0;
-            for(let i = data.length - 21; i < data.length - 1; i++) { 
-                sum += parseFloat(data[i][4]); 
+            let noiseSum = 0;
+            for(let i = data.length - 2; i > data.length - 2 - 20; i--) {
+                const o = parseFloat(data[i][1]);
+                const c = parseFloat(data[i][4]);
+                const rng = parseFloat(data[i][2]) - parseFloat(data[i][3]);
+                let noise = 0;
+                if(rng > 0) noise = 1 - (Math.abs(c - o) / rng);
+                noiseSum += noise;
             }
-            market.ma20 = sum / 20;
+            market.k = parseFloat((noiseSum / 20).toFixed(2));
 
-            updateUI();
-        } catch(e) { 
+            let closeSum = 0;
+            for(let i = data.length - 2; i > data.length - 2 - 20; i--) {
+                closeSum += parseFloat(data[i][4]);
+            }
+            market.ma20 = closeSum / 20;
+
+            let hh = -Infinity;
+            let ll = Infinity;
+            for(let i = data.length - 1; i > data.length - 1 - 14; i--) {
+                const h = parseFloat(data[i][2]);
+                const l = parseFloat(data[i][3]);
+                if(h > hh) hh = h;
+                if(l < ll) ll = l;
+            }
+            let wr = -50;
+            if(hh !== ll) wr = ((hh - market.current) / (hh - ll)) * -100;
+
+            updateUI(wr);
+        } catch(e) {
             console.error(e);
-            document.getElementById('statusMsg').innerText = "연결 재시도 중...";
+            document.getElementById('msg').innerText = "연결 재시도 중...";
         }
     }
 
-    function updateUI() {
+    function updateUI(wr) {
         if(market.current === 0) return;
 
-        const k = parseFloat(document.getElementById('kInput').value);
-        const badge = document.getElementById('trendBadge');
-        const box = document.getElementById('actionBox');
-        const title = document.getElementById('actionTitle');
-        const target = document.getElementById('targetPrice');
-        const stop = document.getElementById('stopPrice');
-        const msg = document.getElementById('statusMsg');
-
         document.getElementById('curPrice').innerText = market.current.toFixed(precision);
-        document.getElementById('maPrice').innerText = market.ma20.toFixed(precision);
-
-        if (market.current > market.ma20) {
-            strategy.direction = 'LONG';
-            strategy.entry = market.open + (market.range * k);
-            strategy.stop = strategy.entry - (market.range * 0.5);
-            
-            badge.className = "badge trend-up";
-            badge.innerText = "▲ TREND: ONLY LONG";
-            title.innerHTML = `LONG ENTRY PRICE <span class="help-icon" data-tooltip="오늘 이 가격에 도달하면 추세가 터진 것입니다.&#10;거래소 앱에서 '예약 매수(Stop Market)'를 걸어두세요.">?</span>`;
-            target.style.color = "var(--green)";
-            stop.innerText = strategy.stop.toFixed(precision);
-            box.style.borderColor = "var(--green)";
-
-            if(market.current >= strategy.entry) {
-                msg.innerText = "🚀 진입 체결 완료 (HOLD)";
-                msg.style.color = "var(--green)";
-                box.style.background = "rgba(14, 203, 129, 0.1)";
-            } else {
-                msg.innerText = "목표가 도달 대기 중...";
-                msg.style.color = "#666";
-                box.style.background = "#13161a";
-            }
-        } else {
-            strategy.direction = 'SHORT';
-            strategy.entry = market.open - (market.range * k);
-            strategy.stop = strategy.entry + (market.range * 0.5);
-            
-            badge.className = "badge trend-down";
-            badge.innerText = "▼ TREND: ONLY SHORT";
-            title.innerHTML = `SHORT ENTRY PRICE <span class="help-icon" data-tooltip="오늘 이 가격에 도달하면 추세가 터진 것입니다.&#10;거래소 앱에서 '예약 매수(Stop Market)'를 걸어두세요.">?</span>`;
-            target.style.color = "var(--red)";
-            stop.innerText = strategy.stop.toFixed(precision);
-            box.style.borderColor = "var(--red)";
-
-            if(market.current <= strategy.entry) {
-                msg.innerText = "🚀 진입 체결 완료 (HOLD)";
-                msg.style.color = "var(--red)";
-                box.style.background = "rgba(246, 70, 93, 0.1)";
-            } else {
-                msg.innerText = "목표가 도달 대기 중...";
-                msg.style.color = "#666";
-                box.style.background = "#13161a";
-            }
-        }
+        document.getElementById('kVal').innerText = market.k.toFixed(2);
         
-        target.innerText = strategy.entry.toFixed(precision);
+        const kMsg = document.getElementById('kMsg');
+        if(market.k > 0.6) { kMsg.innerText = "혼조세: K값 상향 (안전)"; kMsg.style.color="var(--gold)"; }
+        else if(market.k < 0.4) { kMsg.innerText = "추세장: K값 하향 (공격)"; kMsg.style.color="var(--green)"; }
+        else { kMsg.innerText = "표준 변동성"; kMsg.style.color="#666"; }
+
+        const isBull = market.current > market.ma20;
+        const trendVal = document.getElementById('trendVal');
+        const trendMsg = document.getElementById('trendMsg');
+        
+        if(isBull) {
+            trendVal.innerHTML = "<span style='color:var(--green)'>▲ 상승장 (Bull)</span>";
+            trendMsg.innerText = "롱 유리 / 숏 주의";
+        } else {
+            trendVal.innerHTML = "<span style='color:var(--red)'>▼ 하락장 (Bear)</span>";
+            trendMsg.innerText = "숏 유리 / 롱 주의";
+        }
+
+        const longPrice = market.open + (market.range * market.k);
+        const shortPrice = market.open - (market.range * market.k);
+        const slDist = market.range * 0.5;
+        const longSl = longPrice - slDist;
+        const shortSl = shortPrice + slDist;
+
+        document.getElementById('longTarget').innerText = longPrice.toFixed(precision);
+        document.getElementById('longSl').innerText = longSl.toFixed(precision);
+        document.getElementById('shortTarget').innerText = shortPrice.toFixed(precision);
+        document.getElementById('shortSl').innerText = shortSl.toFixed(precision);
+
+        document.getElementById('badgeLongSafe').style.display = isBull ? 'inline-block' : 'none';
+        document.getElementById('badgeLongRisk').style.display = isBull ? 'none' : 'inline-block';
+        document.getElementById('badgeShortSafe').style.display = !isBull ? 'inline-block' : 'none';
+        document.getElementById('badgeShortRisk').style.display = !isBull ? 'none' : 'inline-block';
+
+        const boxLong = document.getElementById('boxLong');
+        const boxShort = document.getElementById('boxShort');
+        const msg = document.getElementById('msg');
+        
+        boxLong.classList.remove('active');
+        boxShort.classList.remove('active');
+        msg.innerText = "돌파 대기 중...";
+        msg.style.color = "#ccc";
+
+        if(market.current >= longPrice) {
+            boxLong.classList.add('active');
+            msg.innerText = "🚀 LONG 진입 신호!";
+            msg.style.color = "var(--green)";
+        } else if(market.current <= shortPrice) {
+            boxShort.classList.add('active');
+            msg.innerText = "🚀 SHORT 진입 신호!";
+            msg.style.color = "var(--red)";
+        }
+
+        let displayPercent = wr + 100; 
+        const wrVal = document.getElementById('wrVal');
+        const wrFill = document.getElementById('wrFill');
+        const wrDesc = document.getElementById('wrDesc');
+
+        wrVal.innerText = wr.toFixed(2);
+        wrFill.style.width = displayPercent + "%";
+
+        if(wr <= -80) { 
+            wrFill.style.background = "var(--green)";
+            wrVal.style.color = "var(--green)";
+            wrDesc.innerHTML = "현재 <b style='color:var(--green)'>과매도</b> 구간 (매수 기회)";
+        } else if(wr >= -20) { 
+            wrFill.style.background = "var(--red)";
+            wrVal.style.color = "var(--red)";
+            wrDesc.innerHTML = "현재 <b style='color:var(--red)'>과매수</b> 구간 (청산/숏 고려)";
+        } else {
+            wrFill.style.background = "var(--blue)";
+            wrVal.style.color = "#fff";
+            wrDesc.innerText = "중립 구간";
+        }
+
         calcRisk();
     }
 
+    // [수정됨] 자금 관리 로직 공식 수정
     function calcRisk() {
-        const capital = parseFloat(document.getElementById('capital').value);
-        const riskPer = parseFloat(document.getElementById('riskPer').value) / 100;
-        const leverage = parseFloat(document.getElementById('leverage').value);
-
-        if (!capital || !strategy.entry) return;
-
-        const priceDiff = Math.abs(strategy.entry - strategy.stop);
-        const slPercent = priceDiff / strategy.entry;
+        const capital = parseFloat(document.getElementById('capital').value) || 0;
+        const riskPer = parseFloat(document.getElementById('riskPer').value) || 2;
+        const leverage = parseFloat(document.getElementById('leverage').value) || 1;
         
-        let riskAmount = capital * riskPer;
-        let positionSize = riskAmount / slPercent;
-        let requiredMargin = positionSize / leverage;
+        if(market.current === 0) return;
 
-        if (requiredMargin > capital) requiredMargin = capital;
+        // 1. 손절폭 계산 (윌리엄스: Range * 0.5)
+        const slDist = market.range * 0.5;
+        const slPercent = slDist / market.current; // 예: 0.01 (1%)
+
+        // 2. 리스크 금액 (내가 잃을 각오가 된 돈)
+        const riskAmount = capital * (riskPer / 100);
+
+        // 3. 총 포지션 규모 (Position Size) = 리스크 금액 / 손절%
+        // "이만큼 사야 손절났을 때 딱 2%만 잃는다"
+        const positionSizeUSDT = riskAmount / slPercent;
+
+        // 4. 주문 가능 금액 (Cost) = 총 포지션 / 레버리지
+        // "레버리지를 쓰니까 내 지갑에서는 이만큼만 나간다"
+        const requiredMargin = positionSizeUSDT / leverage;
+
+        // 5. 코인 개수 (Qty) = (Cost * Leverage) / Price
+        // "결국 내가 주문창에 입력할 코인 개수는?"
+        // Cost * Leverage는 결국 Position Size와 같음
+        const coinQty = (requiredMargin * leverage) / market.current;
 
         const marginEl = document.getElementById('recMargin');
         marginEl.innerText = Math.floor(requiredMargin).toLocaleString() + " USDT";
         
-        if(requiredMargin >= capital * 0.9) marginEl.style.color = "var(--red)";
-        else marginEl.style.color = "var(--gold)";
+        document.getElementById('coinQty').innerText = coinQty.toFixed(4);
+
+        if(requiredMargin > capital) {
+            marginEl.style.color = "var(--red)";
+            marginEl.innerText += " (부족!)";
+        } else {
+            marginEl.style.color = "var(--gold)";
+        }
     }
 
     function updateTimer() {
         const now = new Date();
-        let h = parseInt(document.getElementById('resetHour').value);
-        if(document.getElementById('dstCheck').checked) h -= 1;
-        if(h < 0) h = 23;
-
         let target = new Date(now);
-        target.setHours(h, 0, 0, 0);
+        target.setHours(9, 0, 0, 0); 
         if (now > target) target.setDate(target.getDate() + 1);
-
         const diff = target - now;
         const hh = Math.floor(diff / (1000 * 60 * 60));
         const mm = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const ss = Math.floor((diff % (1000 * 60)) / 1000);
-
-        document.getElementById('countdown').innerText = 
-            `${hh < 10 ? '0'+hh : hh}:${mm < 10 ? '0'+mm : mm}:${ss < 10 ? '0'+ss : ss}`;
+        document.getElementById('countdown').innerText = `${hh<10?'0'+hh:hh}:${mm<10?'0'+mm:mm}:${ss<10?'0'+ss:ss}`;
     }
 </script>
 </body>
