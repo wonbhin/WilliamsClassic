@@ -56,43 +56,60 @@
         
         .action-box { 
             text-align: center; padding: 20px 10px; border-radius: 8px; 
-            background: #13161a; border: 1px solid #333; transition: 0.3s; position: relative;
+            background: rgba(0, 0, 0, 0.3); 
+            border: 1px solid #444; 
+            transition: 0.3s; position: relative;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .action-box.long { border-color: #1e3a2f; color: #6db695; }
-        .action-box.short { border-color: #3a1e22; color: #b66d74; }
         
-        .action-box.long.active { background: rgba(14, 203, 129, 0.2); border-color: var(--green); color: var(--green); transform: scale(1.02); }
-        .action-box.short.active { background: rgba(246, 70, 93, 0.2); border-color: var(--red); color: var(--red); transform: scale(1.02); }
+        .action-box.long { border-color: rgba(14, 203, 129, 0.3); }
+        .action-box.short { border-color: rgba(246, 70, 93, 0.3); }
         
-        .box-title { font-size: 0.8rem; font-weight: bold; margin-bottom: 8px; opacity: 0.8; letter-spacing: 0.5px; }
+        .action-box.long .box-title { color: var(--green); }
+        .action-box.long .box-price { color: #fff; }
+        
+        .action-box.short .box-title { color: var(--red); }
+        .action-box.short .box-price { color: #fff; }
+
+        .action-box.long.active { 
+            background: rgba(14, 203, 129, 0.1); 
+            border: 2px solid var(--green); 
+            box-shadow: 0 0 15px rgba(14, 203, 129, 0.2);
+            transform: scale(1.02); 
+        }
+        .action-box.short.active { 
+            background: rgba(246, 70, 93, 0.1); 
+            border: 2px solid var(--red); 
+            box-shadow: 0 0 15px rgba(246, 70, 93, 0.2);
+            transform: scale(1.02); 
+        }
+        
+        .box-title { font-size: 0.8rem; font-weight: bold; margin-bottom: 8px; letter-spacing: 0.5px; }
         .box-price { font-size: 1.4rem; font-weight: bold; margin-bottom: 8px; letter-spacing: 0.5px; }
         
         .sl-label { 
-            font-size: 0.85rem; color: var(--red); font-weight: bold; 
-            background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 4px; display: inline-block; 
+            font-size: 0.8rem; 
+            color: var(--red); 
+            font-weight: bold; 
+            background: rgba(255,255,255,0.05); 
+            padding: 4px 8px; border-radius: 4px; display: inline-block; 
         }
 
         .badge-wrapper { margin-top: 10px; width: 100%; display: flex; justify-content: center; flex-wrap: wrap; gap: 5px; }
         
-        /* 뱃지 스타일 수정 (색상 대비 강화) */
         .trend-warning { 
             display: none; 
-            background: var(--gold); 
-            color: #111; /* 검은 글씨로 가독성 확보 */
-            font-size: 0.75rem; 
-            font-weight: bold; 
-            padding: 4px 8px; 
-            border-radius: 4px; 
+            background: transparent; 
+            border: 1px solid var(--gold);
+            color: var(--gold); 
+            font-size: 0.75rem; font-weight: bold; padding: 4px 8px; border-radius: 4px; 
         }
         .trend-safe { 
             display: none; 
-            background: var(--green); /* 밝은 녹색 */
-            color: #111; /* 검은 글씨로 가독성 확보 */
-            font-size: 0.75rem; 
-            font-weight: bold; /* 굵게 */
-            padding: 4px 8px; 
-            border-radius: 4px; 
+            background: transparent;
+            border: 1px solid var(--green);
+            color: var(--green);
+            font-size: 0.75rem; font-weight: bold; padding: 4px 8px; border-radius: 4px; 
         }
 
         .wr-card { background: #161a1e; border: 1px solid #333; border-radius: 10px; padding: 20px; margin-top: 15px; }
@@ -125,45 +142,18 @@
         .qty-big { font-size: 1.5rem; font-weight: bold; color: var(--gold); display: block; text-align: center; margin-bottom: 5px; }
 
         .footer-principles {
-            margin-top: 30px;
-            padding: 20px;
-            background: #101216;
-            border-top: 1px solid #333;
-            border-radius: 8px;
-            color: #888;
-            font-size: 0.85rem;
-            line-height: 1.6;
+            margin-top: 30px; padding: 20px; background: #101216; border-top: 1px solid #333;
+            border-radius: 8px; color: #888; font-size: 0.85rem; line-height: 1.6;
         }
-        .footer-title {
-            color: var(--gold);
-            font-weight: bold;
-            margin-bottom: 12px;
-            font-size: 1rem;
-        }
-        .footer-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .footer-list li {
-            position: relative;
-            padding-left: 20px;
-            margin-bottom: 8px;
-            word-break: keep-all; 
-            line-height: 1.5;
-        }
-        .footer-list li::before {
-            content: "•";
-            color: var(--blue);
-            font-weight: bold;
-            position: absolute;
-            left: 0;
-            top: 0;
-        }
+        .footer-title { color: var(--gold); font-weight: bold; margin-bottom: 12px; font-size: 1rem; }
+        .footer-list { list-style: none; padding: 0; margin: 0; }
+        .footer-list li { position: relative; padding-left: 20px; margin-bottom: 8px; word-break: keep-all; line-height: 1.5; }
+        .footer-list li::before { content: "•"; color: var(--blue); font-weight: bold; position: absolute; left: 0; top: 0; }
 
         @media (max-width: 480px) {
             .container { width: 100%; padding: 5px; }
             .card { padding: 15px; }
+            .info-grid { grid-template-columns: 1fr; gap: 10px; }
             .coin-header { flex-direction: column; align-items: stretch; gap: 10px; }
             .coin-header > div { display: flex; justify-content: space-between; align-items: baseline; }
             .coin-select { width: 100%; text-align: center; padding: 12px; }
@@ -233,18 +223,18 @@
             <div id="boxLong" class="action-box long">
                 <div class="box-title">▲ LONG ENTRY PRICE</div>
                 <div id="longTarget" class="box-price mono">---</div>
-                <div class="sl-label">STOP: <span id="longSl" class="mono">---</span></div>
+                <div class="sl-label">STOP LOSS: <span id="longSl" class="mono">---</span></div>
                 <div class="badge-wrapper">
-                    <div id="badgeLongSafe" class="trend-safe">✅ 순방향 (Safe)</div>
+                    <div id="badgeLongSafe" class="trend-safe">✅ 현재 추세</div>
                     <div id="badgeLongRisk" class="trend-warning">⚠️ 역추세 주의</div>
                 </div>
             </div>
             <div id="boxShort" class="action-box short">
                 <div class="box-title">▼ SHORT ENTRY PRICE</div>
                 <div id="shortTarget" class="box-price mono">---</div>
-                <div class="sl-label">STOP: <span id="shortSl" class="mono">---</span></div>
+                <div class="sl-label">STOP LOSS: <span id="shortSl" class="mono">---</span></div>
                 <div class="badge-wrapper">
-                    <div id="badgeShortSafe" class="trend-safe">✅ 순방향 (Safe)</div>
+                    <div id="badgeShortSafe" class="trend-safe">✅ 현재 추세</div>
                     <div id="badgeShortRisk" class="trend-warning">⚠️ 역추세 주의</div>
                 </div>
             </div>
