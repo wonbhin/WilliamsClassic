@@ -150,6 +150,19 @@
         .footer-list li { position: relative; padding-left: 20px; margin-bottom: 8px; word-break: keep-all; line-height: 1.5; }
         .footer-list li::before { content: "•"; color: var(--blue); font-weight: bold; position: absolute; left: 0; top: 0; }
 
+        /* 요약 카드 스타일 */
+        .summary-box { 
+            border: 1px solid #333; border-radius: 8px; padding: 10px; margin-bottom: 10px; background: rgba(0,0,0,0.2);
+        }
+        .summary-header {
+            font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px; font-size: 0.9rem;
+        }
+        .summary-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; text-align: center;
+        }
+        .sum-label { font-size: 0.75rem; color: #aaa; margin-bottom: 4px; }
+        .sum-val { font-size: 0.9rem; font-weight: bold; }
+
         @media (max-width: 480px) {
             .container { width: 100%; padding: 5px; }
             .card { padding: 15px; }
@@ -300,6 +313,46 @@
         </div>
     </div>
 
+    <div class="card" style="margin-top:10px;">
+        <div style="font-weight:bold; color:#fff; margin-bottom:15px; font-size:1rem;">⚡ 거래소 주문 요약 (Order Summary)</div>
+        
+        <div class="summary-box" style="border-color: var(--green);">
+            <div class="summary-header" style="color:var(--green);">▲ LONG 주문 (매수)</div>
+            <div class="summary-grid">
+                <div>
+                    <div class="sum-label">진입가 (Entry)</div>
+                    <div id="sumLongEntry" class="sum-val mono">---</div>
+                </div>
+                <div>
+                    <div class="sum-label">수량 (Qty)</div>
+                    <div id="sumLongQty" class="sum-val mono">---</div>
+                </div>
+                <div>
+                    <div class="sum-label">스탑로스 (SL)</div>
+                    <div id="sumLongSl" class="sum-val mono" style="color:var(--red);">---</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-box" style="border-color: var(--red); margin-bottom: 0;">
+            <div class="summary-header" style="color:var(--red);">▼ SHORT 주문 (매도)</div>
+            <div class="summary-grid">
+                <div>
+                    <div class="sum-label">진입가 (Entry)</div>
+                    <div id="sumShortEntry" class="sum-val mono">---</div>
+                </div>
+                <div>
+                    <div class="sum-label">수량 (Qty)</div>
+                    <div id="sumShortQty" class="sum-val mono">---</div>
+                </div>
+                <div>
+                    <div class="sum-label">스탑로스 (SL)</div>
+                    <div id="sumShortSl" class="sum-val mono" style="color:var(--red);">---</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="footer-principles">
         <div class="footer-title">📜 래리 윌리엄스의 투자 원칙</div>
         <ul class="footer-list">
@@ -422,6 +475,12 @@
         document.getElementById('shortTarget').innerText = shortPrice.toFixed(precision);
         document.getElementById('shortSl').innerText = shortSl.toFixed(precision);
 
+        // 요약 카드 업데이트 (가격 및 스탑로스)
+        document.getElementById('sumLongEntry').innerText = longPrice.toFixed(precision);
+        document.getElementById('sumLongSl').innerText = longSl.toFixed(precision);
+        document.getElementById('sumShortEntry').innerText = shortPrice.toFixed(precision);
+        document.getElementById('sumShortSl').innerText = shortSl.toFixed(precision);
+
         document.getElementById('badgeLongSafe').style.display = isBull ? 'inline-block' : 'none';
         document.getElementById('badgeLongRisk').style.display = isBull ? 'none' : 'inline-block';
         document.getElementById('badgeShortSafe').style.display = !isBull ? 'inline-block' : 'none';
@@ -490,10 +549,15 @@
         const costLong = (longPrice * coinQty) / leverage;
         const costShort = (shortPrice * coinQty) / leverage;
 
-        document.getElementById('coinQty').innerText = coinQty.toFixed(4);
+        const qtyFixed = coinQty.toFixed(4);
+        document.getElementById('coinQty').innerText = qtyFixed;
         document.getElementById('longCost').innerText = Math.floor(costLong).toLocaleString() + " $";
         document.getElementById('shortCost').innerText = Math.floor(costShort).toLocaleString() + " $";
         
+        // 요약 카드 업데이트 (수량)
+        document.getElementById('sumLongQty').innerText = qtyFixed;
+        document.getElementById('sumShortQty').innerText = qtyFixed;
+
         const maxCost = Math.max(costLong, costShort);
         const qtyEl = document.getElementById('coinQty');
         
