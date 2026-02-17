@@ -162,6 +162,29 @@
         }
         .sum-label { font-size: 0.75rem; color: #aaa; margin-bottom: 4px; }
         .sum-val { font-size: 0.9rem; font-weight: bold; }
+        
+        /* 탭 버튼 스타일 (세그먼트 컨트롤) */
+        .tab-group {
+            display: flex; background: #252a30; border-radius: 4px; padding: 2px; gap: 2px;
+        }
+        .tab-btn {
+            flex: 1; text-align: center; padding: 4px 8px; font-size: 0.7rem; color: #848e9c; 
+            cursor: pointer; border-radius: 3px; font-weight: 500; transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: #3b82f6; color: #fff; font-weight: bold;
+        }
+
+        /* 수동 입력창 스타일 (이질감 없애기) */
+        .seamless-input {
+            width: 100%; background: transparent; border: none; 
+            border-bottom: 1px dashed #555;
+            color: #fff; font-size: 1rem; font-weight: bold; 
+            font-family: 'Roboto Mono', monospace;
+            padding: 0; margin: 0; outline: none;
+            transition: border-color 0.2s;
+        }
+        .seamless-input:focus { border-bottom: 1px solid var(--blue); }
 
         @media (max-width: 480px) {
             .container { width: 100%; padding: 5px; }
@@ -210,12 +233,25 @@
 
         <div class="info-grid">
             <div class="info-box">
-                <div class="info-label">
-                    Dynamic K (20일)
+                <div class="info-label" style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>Noise K Factor</span>
+                    <div class="tab-group">
+                        <div id="tabAuto" class="tab-btn active" onclick="setKMode('auto')">자동</div>
+                        <div id="tabManual" class="tab-btn" onclick="setKMode('manual')">수동</div>
+                    </div>
                 </div>
-                <div id="kVal" class="info-val mono">0.50</div>
+                
+                <div id="kAutoWrap">
+                    <div id="kVal" class="info-val mono">0.50</div>
+                </div>
+                
+                <div id="kManualWrap" style="display:none;">
+                    <input type="number" id="kInput" class="seamless-input" value="0.5" step="0.05" oninput="recalcAnalysis()">
+                </div>
+
                 <div id="kMsg" class="info-sub">데이터 계산 중...</div>
             </div>
+
             <div class="info-box">
                 <div class="info-label">
                     Market Trend (20MA)
@@ -369,6 +405,9 @@
     let precision = 2;
     let globalLongPrice = 0;
     let globalShortPrice = 0;
+    
+    let globalData = null; 
+    let currentKMode = 'auto'; // 'auto' or 'manual'
 
     resetData();
     setInterval(fetchData, 2000);
@@ -381,7 +420,33 @@
         document.getElementById('coinSymbol').innerText = symbolCode;
         document.getElementById('qtyUnit').innerText = symbolCode;
         document.getElementById('msg').innerText = "데이터 분석 중...";
+        globalData = null;
         fetchData();
+    }
+
+    // 탭 변경 함수 (세그먼트 컨트롤)
+    function setKMode(mode) {
+        currentKMode = mode;
+        const autoWrap = document.getElementById('kAutoWrap');
+        const manualWrap = document.getElementById('kManualWrap');
+        const tabAuto = document.getElementById('tabAuto');
+        const tabManual = document.getElementById('tabManual');
+        
+        if (mode === 'manual') {
+            tabAuto.classList.remove('active');
+            tabManual.classList.add('active');
+            
+            autoWrap.style.display = 'none';
+            manualWrap.style.display = 'block';
+            document.getElementById('kInput').focus();
+        } else {
+            tabAuto.classList.add('active');
+            tabManual.classList.remove('active');
+            
+            autoWrap.style.display = 'block';
+            manualWrap.style.display = 'none';
+        }
+        recalcAnalysis(); // 모드 변경 시 즉시 재계산
     }
 
     async function fetchData() {
@@ -395,59 +460,96 @@
             const data = await res.json();
             if(!data || data.length < 50) throw new Error("API Error");
 
-            const today = data[data.length - 1]; 
-            const prev = data[data.length - 2]; 
+            globalData = data;
+            recalcAnalysis();
 
-            market.current = parseFloat(today[4]); 
-            market.open = parseFloat(today[1]);    
-            market.range = parseFloat(prev[2]) - parseFloat(prev[3]); 
-
-            let noiseSum = 0;
-            for(let i = data.length - 2; i > data.length - 2 - 20; i--) {
-                const o = parseFloat(data[i][1]);
-                const c = parseFloat(data[i][4]);
-                const rng = parseFloat(data[i][2]) - parseFloat(data[i][3]);
-                let noise = 0;
-                if(rng > 0) noise = 1 - (Math.abs(c - o) / rng);
-                noiseSum += noise;
-            }
-            market.k = parseFloat((noiseSum / 20).toFixed(2));
-
-            let closeSum = 0;
-            for(let i = data.length - 2; i > data.length - 2 - 20; i--) {
-                closeSum += parseFloat(data[i][4]);
-            }
-            market.ma20 = closeSum / 20;
-
-            let hh = -Infinity;
-            let ll = Infinity;
-            for(let i = data.length - 1; i > data.length - 1 - 14; i--) {
-                const h = parseFloat(data[i][2]);
-                const l = parseFloat(data[i][3]);
-                if(h > hh) hh = h;
-                if(l < ll) ll = l;
-            }
-            let wr = -50;
-            if(hh !== ll) wr = ((hh - market.current) / (hh - ll)) * -100;
-
-            updateUI(wr);
         } catch(e) {
             console.error(e);
             document.getElementById('msg').innerText = "연결 재시도 중...";
         }
     }
 
+    function recalcAnalysis() {
+        if (!globalData) return;
+        
+        const data = globalData;
+        const today = data[data.length - 1]; 
+        const prev = data[data.length - 2]; 
+
+        market.current = parseFloat(today[4]); 
+        market.open = parseFloat(today[1]);    
+        market.range = parseFloat(prev[2]) - parseFloat(prev[3]); 
+
+        // 자동 K 계산
+        let noiseSum = 0;
+        for(let i = data.length - 2; i > data.length - 2 - 20; i--) {
+            const o = parseFloat(data[i][1]);
+            const c = parseFloat(data[i][4]);
+            const rng = parseFloat(data[i][2]) - parseFloat(data[i][3]);
+            let noise = 0;
+            if(rng > 0) noise = 1 - (Math.abs(c - o) / rng);
+            noiseSum += noise;
+        }
+        const autoK = parseFloat((noiseSum / 20).toFixed(2));
+
+        const kMsg = document.getElementById('kMsg');
+        
+        if (currentKMode === 'manual') {
+            const val = parseFloat(document.getElementById('kInput').value);
+            market.k = isNaN(val) ? 0.5 : val;
+            kMsg.innerText = "사용자 설정값 적용";
+            kMsg.style.color = "var(--blue)";
+            
+            // Auto 값도 업데이트는 해둠 (화면 뒤에서)
+            document.getElementById('kVal').innerText = autoK.toFixed(2);
+        } else {
+            market.k = autoK;
+            document.getElementById('kVal').innerText = market.k.toFixed(2);
+            
+            let statusText = "";
+            let statusColor = "";
+            
+            if(market.k > 0.6) { 
+                statusText = "혼조세: K값 상향 (안전)"; 
+                statusColor = "var(--gold)"; 
+            } else if(market.k < 0.4) { 
+                statusText = "추세장: K값 하향 (공격)"; 
+                statusColor = "var(--green)"; 
+            } else { 
+                statusText = "표준 변동성"; 
+                statusColor = "#666"; 
+            }
+            
+            kMsg.innerHTML = `<span style="color:${statusColor}">${statusText}</span> <span style="color:#666; font-size:0.7rem;">/ 20일 평균</span>`;
+        }
+
+        // MA20
+        let closeSum = 0;
+        for(let i = data.length - 2; i > data.length - 2 - 20; i--) {
+            closeSum += parseFloat(data[i][4]);
+        }
+        market.ma20 = closeSum / 20;
+
+        // WR
+        let hh = -Infinity;
+        let ll = Infinity;
+        for(let i = data.length - 1; i > data.length - 1 - 14; i--) {
+            const h = parseFloat(data[i][2]);
+            const l = parseFloat(data[i][3]);
+            if(h > hh) hh = h;
+            if(l < ll) ll = l;
+        }
+        let wr = -50;
+        if(hh !== ll) wr = ((hh - market.current) / (hh - ll)) * -100;
+
+        updateUI(wr);
+    }
+
     function updateUI(wr) {
         if(market.current === 0) return;
 
         document.getElementById('curPrice').innerText = market.current.toFixed(precision);
-        document.getElementById('kVal').innerText = market.k.toFixed(2);
         
-        const kMsg = document.getElementById('kMsg');
-        if(market.k > 0.6) { kMsg.innerText = "혼조세: K값 상향 (안전)"; kMsg.style.color="var(--gold)"; }
-        else if(market.k < 0.4) { kMsg.innerText = "추세장: K값 하향 (공격)"; kMsg.style.color="var(--green)"; }
-        else { kMsg.innerText = "표준 변동성"; kMsg.style.color="#666"; }
-
         const isBull = market.current > market.ma20;
         const trendVal = document.getElementById('trendVal');
         const trendMsg = document.getElementById('trendMsg');
