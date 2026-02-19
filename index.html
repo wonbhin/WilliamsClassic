@@ -228,6 +228,11 @@
                 <option value="ETHUSDT">Ethereum (ETH)</option>
                 <option value="SOLUSDT">Solana (SOL)</option>
                 <option value="XRPUSDT">Ripple (XRP)</option>
+                <option value="AVAXUSDT">Avalanche (AVAX)</option>
+                <option value="SUIUSDT">Sui (SUI)</option>
+                <option value="SEIUSDT">Sei (SEI)</option>
+                <option value="PEPEUSDT">Pepe (PEPE)</option>
+                <option value="DOGEUSDT">Dogecoin (DOGE)</option>
             </select>
         </div>
 
@@ -452,9 +457,12 @@
     async function fetchData() {
         try {
             const symbol = document.getElementById('coinSelect').value;
+            
+            // 소수점 표시 처리 (계산엔 영향 없고 화면 표기용)
             if(symbol.startsWith('BTC')) precision = 1;
-            else if(symbol.startsWith('XRP')) precision = 4;
-            else precision = 2;
+            else if(symbol.startsWith('XRP') || symbol.startsWith('SUI') || symbol.startsWith('SEI') || symbol.startsWith('DOGE')) precision = 4;
+            else if(symbol.startsWith('PEPE')) precision = 8; // PEPE는 소수점이 매우 길어 8자리 배정
+            else precision = 2; // ETH, SOL, AVAX 등
 
             const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1d&limit=50`);
             const data = await res.json();
